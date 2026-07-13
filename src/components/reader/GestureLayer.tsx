@@ -14,6 +14,14 @@ interface Pointer {
   y: number
 }
 
+interface GestureCallbacks {
+  onCommitZoom: (zoom: number) => void
+  onPrevPage: () => void
+  onNextPage: () => void
+  onToggleChrome: () => void
+  onDoubleTapZoom: () => void
+}
+
 export function GestureLayer({
   children,
   zoom,
@@ -27,14 +35,9 @@ export function GestureLayer({
 }: {
   children: JSX.Element
   zoom: number
-  onCommitZoom: (zoom: number) => void
-  onPrevPage: () => void
-  onNextPage: () => void
-  onToggleChrome: () => void
-  onDoubleTapZoom: () => void
   canPrev: boolean
   canNext: boolean
-}) {
+} & GestureCallbacks) {
   const rootRef = useRef<HTMLDivElement>(null)
   const [dragX, setDragX] = useState(0)
   const [liveScale, setLiveScale] = useState(1)
@@ -45,6 +48,24 @@ export function GestureLayer({
   const dragState = useRef<{ startX: number; startY: number; startTime: number; moved: boolean } | null>(null)
   const pinchState = useRef<{ startDist: number; startZoom: number } | null>(null)
   const lastTapRef = useRef<{ time: number; x: number; y: number } | null>(null)
+
+  // Mirrors of frequently-changing props/state, read by the pointer-event
+  // handlers below. The listener-setup effect only runs once on mount; if it
+  // depended on dragX/liveScale directly it would tear down and rebind native
+  // listeners on every single pointermove, which made swipes feel
+  // unresponsive on real touch hardware.
+  const zoomRef = useRef(zoom)
+  zoomRef.current = zoom
+  const canPrevRef = useRef(canPrev)
+  canPrevRef.current = canPrev
+  const canNextRef = useRef(canNext)
+  canNextRef.current = canNext
+  const dragXRef = useRef(dragX)
+  dragXRef.current = dragX
+  const liveScaleRef = useRef(liveScale)
+  liveScaleRef.current = liveScale
+  const callbacksRef = useRef<GestureCallbacks>({ onCommitZoom, onPrevPage, onNextPage, onToggleChrome, onDoubleTapZoom })
+  callbacksRef.current = { onCommitZoom, onPrevPage, onNextPage, onToggleChrome, onDoubleTapZoom }
 
   useEffect(() => {
     const el = rootRef.current
@@ -63,7 +84,7 @@ export function GestureLayer({
       } else if (pointers.current.size === 2) {
         const [a, b] = Array.from(pointers.current.values())
         const rect = el!.getBoundingClientRect()
-        pinchState.current = { startDist: distance(a, b), startZoom: zoom }
+        pinchState.current = { startDist: distance(a, b), startZoom: zoomRef.current }
         const midX = ((a.x + b.x) / 2 - rect.left) / rect.width
         const midY = ((a.y + b.y) / 2 - rect.top) / rect.height
         setTransformOrigin(`${midX * 100}% ${midY * 100}%`)
@@ -80,7 +101,7 @@ export function GestureLayer({
         const [a, b] = Array.from(pointers.current.values())
         const dist = distance(a, b)
         const rawScale = (dist / pinchState.current.startDist) * pinchState.current.startZoom
-        setLiveScale(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, rawScale)) / zoom)
+        setLiveScale(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, rawScale)) / zoomRef.current)
         return
       }
 
@@ -92,8 +113,8 @@ export function GestureLayer({
         }
         // Only treat as a page-turn drag when zoomed out to 1x; at higher
         // zoom a single-finger drag is reserved for panning (browser default).
-        if (zoom === 1 && Math.abs(dx) > Math.abs(dy)) {
-          if ((dx > 0 && canPrev) || (dx < 0 && canNext)) {
+        if (zoomRef.current === 1 && Math.abs(dx) > Math.abs(dy)) {
+          if ((dx > 0 && canPrevRef.current) || (dx < 0 && canNextRef.current)) {
             setDragX(dx)
           }
         }
@@ -102,8 +123,8 @@ export function GestureLayer({
 
     function finishPinch() {
       if (pinchState.current) {
-        const committed = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, liveScale * zoom))
-        onCommitZoom(committed)
+        const committed = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, liveScaleRef.current * zoomRef.current))
+        callbacksRef.current.onCommitZoom(committed)
         pinchState.current = null
         setLiveScale(1)
       }
@@ -131,30 +152,29 @@ export function GestureLayer({
           Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < TAP_MOVE_TOLERANCE * 2
         ) {
           lastTapRef.current = null
-          onDoubleTapZoom()
-        } else if (relX < EDGE_ZONE_RATIO && canPrev) {
-          onPrevPage()
-        } else if (relX > 1 - EDGE_ZONE_RATIO && canNext) {
-          onNextPage()
+          callbacksRef.current.onDoubleTapZoom()
+        } else if (relX < EDGE_ZONE_RATIO && canPrevRef.current) {
+          callbacksRef.current.onPrevPage()
+        } else if (relX > 1 - EDGE_ZONE_RATIO && canNextRef.current) {
+          callbacksRef.current.onNextPage()
         } else {
-          onToggleChrome()
+          callbacksRef.current.onToggleChrome()
         }
       } else if (dragState.current && dragState.current.moved && pointers.current.size === 0) {
-        const el2 = el!
-        const width = el2.getBoundingClientRect().width
-        const ratio = dragX / width
+        const width = el!.getBoundingClientRect().width
+        const ratio = dragXRef.current / width
         setAnimating(true)
-        if (ratio > SWIPE_COMMIT_RATIO && canPrev) {
+        if (ratio > SWIPE_COMMIT_RATIO && canPrevRef.current) {
           setDragX(width)
           setTimeout(() => {
-            onPrevPage()
+            callbacksRef.current.onPrevPage()
             setDragX(0)
             setAnimating(false)
           }, 180)
-        } else if (ratio < -SWIPE_COMMIT_RATIO && canNext) {
+        } else if (ratio < -SWIPE_COMMIT_RATIO && canNextRef.current) {
           setDragX(-width)
           setTimeout(() => {
-            onNextPage()
+            callbacksRef.current.onNextPage()
             setDragX(0)
             setAnimating(false)
           }, 180)
@@ -177,7 +197,7 @@ export function GestureLayer({
       el.removeEventListener('pointerup', onPointerUp)
       el.removeEventListener('pointercancel', onPointerUp)
     }
-  }, [zoom, liveScale, dragX, canPrev, canNext, onCommitZoom, onPrevPage, onNextPage, onToggleChrome, onDoubleTapZoom])
+  }, [])
 
   return (
     <div ref={rootRef} class="gesture-layer">
