@@ -111,9 +111,13 @@ export function GestureLayer({
         if (Math.abs(dx) > TAP_MOVE_TOLERANCE || Math.abs(dy) > TAP_MOVE_TOLERANCE) {
           dragState.current.moved = true
         }
-        // Only treat as a page-turn drag when zoomed out to 1x; at higher
-        // zoom a single-finger drag is reserved for panning (browser default).
-        if (zoomRef.current === 1 && Math.abs(dx) > Math.abs(dy)) {
+        // Page-turn swipe works regardless of zoom level — panning a zoomed
+        // page isn't implemented, so gating this on zoom === 1 (as a prior
+        // version did) created a dead end: any non-1 zoom (e.g. restored
+        // from a saved position, or an accidental pinch/double-tap) would
+        // permanently disable swipe navigation with no way back except the
+        // page slider.
+        if (Math.abs(dx) > Math.abs(dy)) {
           if ((dx > 0 && canPrevRef.current) || (dx < 0 && canNextRef.current)) {
             setDragX(dx)
           }
