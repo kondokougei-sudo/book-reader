@@ -1,57 +1,45 @@
-import { getAccessToken } from '../auth/googleAuth'
 import { downloadFileBytes } from '../drive/driveClient'
 import { cachePdf, getCachedPdf } from '../storage/pdfBlobCache'
 import { getDocument, type PDFDocumentLoadingTask, type PDFDocumentProxy } from './pdfjsSetup'
 
-const DRIVE_MEDIA_BASE = 'https://www.googleapis.com/drive/v3/files'
-
-interface OpenEntry {
-  task: PDFDocumentLoadingTask
-  promise: Promise<PDFDocumentProxy>
-}
-
-const openDocs = new Map<string, OpenEntry>()
+const openTasks = new Map<string, PDFDocumentLoadingTask>()
+const openDocs = new Map<string, Promise<PDFDocumentProxy>>()
 
 /**
  * Opens a book for reading, memoized per session.
  *
  * Prefers already-cached bytes (works fully offline, no network/token
- * needed). Otherwise opens via pdf.js's URL+range-request streaming so the
- * first page renders without waiting for the whole (often 100MB+) scanned
- * book to download, while kicking off a background full download to
- * populate the offline cache for next time.
+ * needed). Otherwise downloads the full PDF up front before handing it to
+ * pdf.js. We previously tried opening directly via pdf.js's URL+range-request
+ * streaming against Drive's `alt=media` endpoint to avoid this wait, but in
+ * practice range requests past the first page silently stalled (pages beyond
+ * 1 never rendered), so the safer full-download path is used instead.
  */
-export async function openPdf(fileId: string, modifiedTime: string): Promise<PDFDocumentProxy> {
+export function openPdf(fileId: string, modifiedTime: string): Promise<PDFDocumentProxy> {
   const existing = openDocs.get(fileId)
-  if (existing) return existing.promise
+  if (existing) return existing
 
-  const cached = await getCachedPdf(fileId, modifiedTime)
-  const task = cached
-    ? getDocument({ data: cached })
-    : getDocument({
-        url: `${DRIVE_MEDIA_BASE}/${fileId}?alt=media`,
-        httpHeaders: { Authorization: `Bearer ${await getAccessToken()}` },
-      })
+  const promise = (async () => {
+    let bytes = await getCachedPdf(fileId, modifiedTime)
+    if (!bytes) {
+      bytes = await downloadFileBytes(fileId)
+      void cachePdf(fileId, modifiedTime, bytes)
+    }
+    const task = getDocument({ data: bytes })
+    openTasks.set(fileId, task)
+    return task.promise
+  })()
 
-  const promise = task.promise
-  openDocs.set(fileId, { task, promise })
-
-  if (!cached) {
-    void promise.then(() =>
-      downloadFileBytes(fileId)
-        .then((bytes) => cachePdf(fileId, modifiedTime, bytes))
-        .catch((err) => console.warn('バックグラウンドキャッシュに失敗しました', err)),
-    )
-  }
-
+  openDocs.set(fileId, promise)
   return promise
 }
 
 export function closePdf(fileId: string): void {
-  const entry = openDocs.get(fileId)
-  if (entry) {
-    void entry.task.destroy()
-    openDocs.delete(fileId)
+  openDocs.delete(fileId)
+  const task = openTasks.get(fileId)
+  if (task) {
+    void task.destroy()
+    openTasks.delete(fileId)
   }
 }
 
