@@ -1,20 +1,8 @@
-import { theme, brightness, pageMode, type Theme } from '../../state/readerSettings'
+import { brightness, pageMode } from '../../state/readerSettings'
 
 export function ThemeControls({ onClose }: { onClose: () => void }) {
   return (
     <div class="theme-controls">
-      <div class="theme-controls-row">
-        {(['light', 'dark', 'sepia'] as Theme[]).map((t) => (
-          <button
-            key={t}
-            class={theme.value === t ? 'theme-swatch active' : 'theme-swatch'}
-            data-theme={t}
-            onClick={() => (theme.value = t)}
-          >
-            {t === 'light' ? 'ライト' : t === 'dark' ? 'ダーク' : 'セピア'}
-          </button>
-        ))}
-      </div>
       <label class="theme-controls-row">
         明るさ
         <input

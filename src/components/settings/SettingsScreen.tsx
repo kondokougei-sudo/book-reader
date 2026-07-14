@@ -5,7 +5,7 @@ import { getLibraryFolder, setLibraryFolder } from '../../storage/settingsRepo'
 import { listCachedPdfSizes, evictCachedPdf } from '../../storage/pdfBlobCache'
 import { listBooks } from '../../storage/booksRepo'
 import { FolderPicker } from './FolderPicker'
-import { theme, brightness, pageMode, type Theme } from '../../state/readerSettings'
+import { brightness, pageMode } from '../../state/readerSettings'
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
@@ -72,17 +72,6 @@ export function SettingsScreen(_props: { path?: string }) {
 
       <section class="settings-section">
         <h2>読書設定</h2>
-        <label class="settings-row">
-          テーマ
-          <select
-            value={theme.value}
-            onChange={(e) => (theme.value = (e.target as HTMLSelectElement).value as Theme)}
-          >
-            <option value="light">ライト</option>
-            <option value="dark">ダーク</option>
-            <option value="sepia">セピア</option>
-          </select>
-        </label>
         <label class="settings-row">
           明るさ
           <input

@@ -12,8 +12,8 @@ body,
 }
 
 body {
-  background: var(--bg);
-  color: var(--text);
+  background: var(--bg-color);
+  color: var(--text-color);
   font-family: -apple-system, 'Hiragino Sans', 'Noto Sans JP', system-ui, sans-serif;
   overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
@@ -22,6 +22,21 @@ body {
 button {
   font: inherit;
   color: inherit;
+}
+
+select,
+input[type='text'] {
+  font: inherit;
+  color: var(--text-color);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+input[type='range'],
+input[type='checkbox'] {
+  accent-color: var(--primary-color);
 }
 
 .app-shell {
@@ -34,8 +49,8 @@ button {
   display: inline-block;
   width: 28px;
   height: 28px;
-  border: 3px solid var(--border);
-  border-top-color: var(--accent);
+  border: 3px solid var(--border-color);
+  border-top-color: var(--primary-color);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -47,10 +62,11 @@ button {
 }
 
 .error-banner {
-  background: #4a1f1f;
-  color: #ffd7d7;
+  background: color-mix(in srgb, var(--accent-color) 16%, var(--card-bg));
+  color: var(--text-color);
+  border-left: 4px solid var(--accent-color);
   padding: 12px 16px;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   margin: 12px;
   font-size: 14px;
 }
@@ -67,8 +83,8 @@ button {
 }
 
 .primary-button {
-  background: var(--accent);
-  color: #111318;
+  background: var(--primary-color);
+  color: #ffffff;
   border: none;
   border-radius: 999px;
   padding: 12px 28px;
@@ -84,13 +100,13 @@ button {
 .text-button {
   background: none;
   border: none;
-  color: var(--text-muted);
+  color: var(--text-muted-color);
   cursor: pointer;
   padding: 8px 12px;
 }
 
 .text-muted {
-  color: var(--text-muted);
+  color: var(--text-muted-color);
 }
 
 .small-note {
@@ -106,7 +122,7 @@ button {
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .screen-header h1 {
@@ -127,9 +143,9 @@ button {
   margin: 12px 16px;
   padding: 10px 14px;
   border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-color);
   font-size: 15px;
 }
 
@@ -155,10 +171,10 @@ button {
 .book-cover {
   position: relative;
   aspect-ratio: 2 / 3;
-  background: var(--surface-alt);
-  border-radius: 6px;
+  background: var(--surface-alt-color);
+  border-radius: var(--border-radius);
   overflow: hidden;
-  box-shadow: 0 4px 10px var(--shadow);
+  box-shadow: 0 4px 10px var(--shadow-color);
 }
 
 .book-cover img {
@@ -175,7 +191,7 @@ button {
   align-items: center;
   justify-content: center;
   font-size: 36px;
-  color: var(--text-muted);
+  color: var(--text-muted-color);
 }
 
 .book-progress {
@@ -184,12 +200,12 @@ button {
   right: 0;
   bottom: 0;
   height: 4px;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.15);
 }
 
 .book-progress-fill {
   height: 100%;
-  background: var(--accent);
+  background: var(--primary-color);
 }
 
 .book-title {
@@ -224,10 +240,10 @@ button {
 .folder-picker-item {
   width: 100%;
   text-align: left;
-  background: var(--surface);
+  background: var(--card-bg);
   border: none;
-  border-bottom: 1px solid var(--border);
-  color: var(--text);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-color);
   padding: 12px;
   cursor: pointer;
 }
@@ -248,12 +264,12 @@ button {
 
 .settings-section {
   padding: 16px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .settings-section h2 {
   font-size: 14px;
-  color: var(--text-muted);
+  color: var(--text-muted-color);
   margin: 0 0 10px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -278,7 +294,7 @@ button {
   align-items: center;
   gap: 12px;
   padding: 8px 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .cache-list li span:first-child {
@@ -292,7 +308,7 @@ button {
 
 .reader-screen {
   height: 100%;
-  background: var(--reader-page-bg);
+  background: var(--card-bg);
   position: relative;
   overflow: hidden;
 }
@@ -358,7 +374,7 @@ button {
 }
 
 .continuous-page-placeholder {
-  color: var(--text-muted);
+  color: var(--text-muted-color);
   font-size: 13px;
 }
 
@@ -375,7 +391,7 @@ button {
   position: absolute;
   left: 0;
   right: 0;
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  background: color-mix(in srgb, var(--card-bg) 90%, transparent);
   backdrop-filter: blur(6px);
   transition:
     transform 0.2s ease,
@@ -446,7 +462,7 @@ button {
 .drawer-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(27, 38, 32, 0.35);
   z-index: 10;
 }
 
@@ -456,31 +472,33 @@ button {
   right: 0;
   bottom: 0;
   width: min(320px, 85vw);
-  background: var(--surface);
+  background: var(--card-bg);
   z-index: 11;
   display: flex;
   flex-direction: column;
-  box-shadow: -4px 0 16px var(--shadow);
+  border-top-left-radius: var(--border-radius);
+  border-bottom-left-radius: var(--border-radius);
+  box-shadow: -4px 0 16px var(--shadow-color);
 }
 
 .drawer-tabs {
   display: flex;
   align-items: center;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-color);
   padding: 8px;
 }
 
 .drawer-tab {
   background: none;
   border: none;
-  color: var(--text-muted);
+  color: var(--text-muted-color);
   padding: 10px 14px;
   cursor: pointer;
   font-size: 14px;
 }
 
 .drawer-tab.active {
-  color: var(--accent);
+  color: var(--primary-color);
   font-weight: 600;
 }
 
@@ -508,31 +526,31 @@ button {
   gap: 8px;
   background: none;
   border: none;
-  color: var(--text);
+  color: var(--text-color);
   text-align: left;
   padding: 10px 4px;
   cursor: pointer;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .toc-item:disabled {
-  color: var(--text-muted);
+  color: var(--text-muted-color);
   cursor: default;
 }
 
-/* ---------- Theme controls ---------- */
+/* ---------- Display controls (brightness / page mode) ---------- */
 
 .theme-controls {
   position: fixed;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  background: var(--surface);
-  border-radius: 12px;
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
   padding: 20px;
   z-index: 11;
   width: min(320px, 85vw);
-  box-shadow: 0 8px 24px var(--shadow);
+  box-shadow: 0 8px 24px var(--shadow-color);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -543,19 +561,4 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-}
-
-.theme-swatch {
-  flex: 1;
-  padding: 10px 0;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface-alt);
-  color: var(--text);
-  cursor: pointer;
-}
-
-.theme-swatch.active {
-  border-color: var(--accent);
-  color: var(--accent);
 }

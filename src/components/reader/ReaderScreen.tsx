@@ -8,7 +8,7 @@ import { openPdf, closePdf, extractTitle } from '../../pdf/pdfDocument'
 import { getToc, type TocNode } from '../../pdf/outline'
 import type { PDFDocumentProxy } from '../../pdf/pdfjsSetup'
 import type { BookmarkRecord } from '../../storage/db'
-import { theme, brightness, pageMode } from '../../state/readerSettings'
+import { brightness, pageMode } from '../../state/readerSettings'
 import { PageCanvas } from './PageCanvas'
 import { ContinuousReader } from './ContinuousReader'
 import { GestureLayer } from './GestureLayer'
@@ -157,7 +157,7 @@ export function ReaderScreen({ fileId }: { path?: string; fileId?: string }) {
   }
 
   return (
-    <div class={`reader-screen theme-${theme.value}`}>
+    <div class="reader-screen">
       <div ref={containerRef} class="reader-viewport">
         {!doc && (
           <div class="centered">

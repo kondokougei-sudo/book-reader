@@ -1,36 +1,18 @@
-:root,
-.theme-dark {
-  --bg: #111318;
-  --surface: #1b1e26;
-  --surface-alt: #262a35;
-  --text: #eef0f4;
-  --text-muted: #9aa1af;
-  --accent: #e8b94d;
-  --border: #333846;
-  --shadow: rgba(0, 0, 0, 0.5);
-  --reader-page-bg: #1c1c1c;
-}
+/* YandY (https://yandy-inc.com/) warm earth-tone palette — light mode only.
+   Long-form study/reading sessions call for low-glare, warm neutrals rather
+   than a dark theme, so this is the single always-on design system. */
+:root {
+  --bg-color: #faf6f0; /* キャンバスベージュ */
+  --text-color: #1b2620; /* フォレストブラック */
+  --primary-color: #2d6a4f; /* メディカルリーフ（進捗・完了・主要アクション） */
+  --accent-color: #e67e22; /* ナレッジアンバー（ハイライト・警告） */
+  --card-bg: #ffffff; /* カード・パネル用純白 */
+  --border-radius: 16px;
 
-.theme-light {
-  --bg: #f4f2ee;
-  --surface: #ffffff;
-  --surface-alt: #eceae5;
-  --text: #1c1c1e;
-  --text-muted: #6b6b70;
-  --accent: #a8720f;
-  --border: #ddd9d0;
-  --shadow: rgba(0, 0, 0, 0.15);
-  --reader-page-bg: #ffffff;
-}
-
-.theme-sepia {
-  --bg: #efe3cf;
-  --surface: #f7ecd9;
-  --surface-alt: #e9dbbf;
-  --text: #4a3826;
-  --text-muted: #8a765b;
-  --accent: #96591b;
-  --border: #d8c7a3;
-  --shadow: rgba(74, 56, 38, 0.25);
-  --reader-page-bg: #f7ecd9;
+  /* Supporting tones derived from the same warm palette, used throughout
+     the UI for secondary surfaces, muted text, borders, and shadows. */
+  --surface-alt-color: #f1eae0;
+  --text-muted-color: #5b6b60;
+  --border-color: #e4dcce;
+  --shadow-color: rgba(27, 38, 32, 0.1);
 }
