@@ -218,7 +218,9 @@ export function ReaderScreen({ fileId }: { path?: string; fileId?: string }) {
       <TocDrawer
         open={tocOpen}
         onClose={() => setTocOpen(false)}
-        toc={toc}
+        fileId={fileId}
+        autoToc={toc}
+        totalPages={totalPages}
         bookmarks={bookmarks}
         onJump={(p) => {
           goToPage(p)

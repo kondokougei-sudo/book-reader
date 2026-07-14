@@ -575,6 +575,35 @@ input[type='checkbox'] {
   cursor: default;
 }
 
+.toc-panel-actions {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 8px;
+}
+
+.toc-edit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toc-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toc-edit-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.toc-edit-page {
+  width: 64px;
+}
+
 /* ---------- Display controls (brightness / page mode) ---------- */
 
 .theme-controls {

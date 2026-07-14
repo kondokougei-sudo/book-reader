@@ -40,3 +40,13 @@ export async function getToc(doc: PDFDocumentProxy): Promise<TocNode[]> {
   if (!outline || outline.length === 0) return []
   return convert(doc, outline)
 }
+
+/** Flattens a nested outline into a simple ordered list, for seeding a hand-editable TOC. */
+export function flattenToc(nodes: TocNode[]): { title: string; page: number }[] {
+  const flat: { title: string; page: number }[] = []
+  for (const node of nodes) {
+    if (node.page !== null) flat.push({ title: node.title, page: node.page })
+    flat.push(...flattenToc(node.children))
+  }
+  return flat
+}
