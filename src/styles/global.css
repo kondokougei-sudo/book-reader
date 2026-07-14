@@ -386,6 +386,43 @@ input[type='checkbox'] {
   transition: opacity 0.15s;
 }
 
+.page-nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: color-mix(in srgb, var(--card-bg) 78%, transparent);
+  color: var(--text-color);
+  font-size: 26px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px var(--shadow-color);
+  z-index: 4;
+}
+
+.page-nav-button:active {
+  background: var(--card-bg);
+}
+
+.page-nav-button:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.page-nav-button-prev {
+  left: 12px;
+}
+
+.page-nav-button-next {
+  right: 12px;
+}
+
 .reader-topbar,
 .reader-bottombar {
   position: absolute;

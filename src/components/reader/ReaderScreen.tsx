@@ -10,6 +10,7 @@ import type { PDFDocumentProxy } from '../../pdf/pdfjsSetup'
 import type { BookmarkRecord } from '../../storage/db'
 import { brightness, pageMode } from '../../state/readerSettings'
 import { PageCanvas } from './PageCanvas'
+import { PageNavButtons } from './PageNavButtons'
 import { ContinuousReader } from './ContinuousReader'
 import { GestureLayer } from './GestureLayer'
 import { ReaderChrome } from './ReaderChrome'
@@ -190,6 +191,14 @@ export function ReaderScreen({ fileId }: { path?: string; fileId?: string }) {
               />
             )}
             <div class="brightness-overlay" style={{ opacity: 1 - brightness.value }} />
+            {pageMode.value === 'single' && (
+              <PageNavButtons
+                canPrev={currentPage > 1}
+                canNext={currentPage < totalPages}
+                onPrev={() => goToPage(currentPage - 1)}
+                onNext={() => goToPage(currentPage + 1)}
+              />
+            )}
           </>
         )}
       </div>
